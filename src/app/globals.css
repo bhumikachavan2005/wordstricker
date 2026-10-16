@@ -1,0 +1,406 @@
+@import "tailwindcss";
+
+/* ── Google Fonts imported via Next.js layout ── */
+
+:root {
+  --font-inter: "Inter", sans-serif;
+  --font-outfit: "Outfit", sans-serif;
+
+  /* ── Color palette ── */
+  --color-bg-base: #030712;
+  --color-bg-surface: #0d1117;
+  --color-bg-elevated: #161b22;
+  --color-bg-card: #1c2333;
+  --color-border: #30363d;
+  --color-border-subtle: #21262d;
+
+  /* Vinuu — Purple/Violet */
+  --color-vinuu-primary: #7c3aed;
+  --color-vinuu-light: #a78bfa;
+  --color-vinuu-dark: #4c1d95;
+  --color-vinuu-glow: rgba(124, 58, 237, 0.3);
+
+  /* Bhuu — Amber/Orange */
+  --color-bhuu-primary: #f59e0b;
+  --color-bhuu-light: #fcd34d;
+  --color-bhuu-dark: #92400e;
+  --color-bhuu-glow: rgba(245, 158, 11, 0.3);
+
+  /* Accent */
+  --color-accent-teal: #14b8a6;
+  --color-accent-pink: #ec4899;
+  --color-accent-emerald: #10b981;
+
+  /* Semantic */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+}
+
+/* ── Base styles ── */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-inter);
+  background-color: var(--color-bg-base);
+  color: #e2e8f0;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Typography ── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-outfit);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #484f58;
+}
+
+/* ── Glass morphism card ── */
+.glass-card {
+  background: rgba(22, 27, 34, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(48, 54, 61, 0.5);
+  border-radius: 16px;
+}
+
+/* ── Glow effects ── */
+.glow-vinuu {
+  box-shadow: 0 0 20px var(--color-vinuu-glow),
+              0 0 40px rgba(124, 58, 237, 0.1);
+}
+.glow-bhuu {
+  box-shadow: 0 0 20px var(--color-bhuu-glow),
+              0 0 40px rgba(245, 158, 11, 0.1);
+}
+
+/* ── Gradient text ── */
+.gradient-text-vinuu {
+  background: linear-gradient(135deg, #a78bfa, #7c3aed);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.gradient-text-bhuu {
+  background: linear-gradient(135deg, #fcd34d, #f59e0b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.gradient-text-streak {
+  background: linear-gradient(135deg, #f97316, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Animated gradient background ── */
+.animated-bg {
+  background: linear-gradient(
+    -45deg,
+    #030712,
+    #0d1117,
+    #1a0533,
+    #0d1117
+  );
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ── Word card flip ── */
+.word-card-container {
+  perspective: 1000px;
+}
+.word-card-inner {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.word-card-container.flipped .word-card-inner {
+  transform: rotateY(180deg);
+}
+.word-card-front,
+.word-card-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.word-card-back {
+  transform: rotateY(180deg);
+}
+
+/* ── Progress bar ── */
+.progress-bar {
+  height: 6px;
+  background: var(--color-bg-elevated);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Animations ── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes bounce-subtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease forwards;
+}
+.animate-slide-in-right {
+  animation: slideInRight 0.4s ease forwards;
+}
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+.animate-bounce-subtle {
+  animation: bounce-subtle 2s ease-in-out infinite;
+}
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+/* ── Streak fire animation ── */
+@keyframes flicker {
+  0%, 100% { transform: scaleY(1) rotate(-1deg); }
+  33% { transform: scaleY(1.1) rotate(1deg); }
+  66% { transform: scaleY(0.95) rotate(-0.5deg); }
+}
+.animate-flicker {
+  animation: flicker 1.5s ease-in-out infinite;
+  display: inline-block;
+  transform-origin: bottom center;
+}
+
+/* ── Stagger children ── */
+.stagger-children > * {
+  animation: fadeInUp 0.5s ease forwards;
+  opacity: 0;
+}
+.stagger-children > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.1s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.2s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.25s; }
+.stagger-children > *:nth-child(6) { animation-delay: 0.3s; }
+.stagger-children > *:nth-child(7) { animation-delay: 0.35s; }
+.stagger-children > *:nth-child(8) { animation-delay: 0.4s; }
+.stagger-children > *:nth-child(9) { animation-delay: 0.45s; }
+.stagger-children > *:nth-child(10) { animation-delay: 0.5s; }
+
+/* ── Skeleton loading ── */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-elevated) 25%,
+    #21262d 50%,
+    var(--color-bg-elevated) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Difficulty badges ── */
+.badge-easy { 
+  background: rgba(16, 185, 129, 0.15); 
+  color: #34d399; 
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.badge-medium { 
+  background: rgba(245, 158, 11, 0.15); 
+  color: #fbbf24; 
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.badge-hard { 
+  background: rgba(239, 68, 68, 0.15); 
+  color: #f87171; 
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* ── Status badges ── */
+.status-not-started { color: #6b7280; }
+.status-learning { color: #60a5fa; }
+.status-completed { color: #34d399; }
+.status-locked-in { color: #a78bfa; }
+
+/* ── Interactive hover effects ── */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.hover-glow-vinuu:hover {
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);
+}
+.hover-glow-bhuu:hover {
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+}
+
+/* ── Button base ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn-primary-vinuu {
+  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  color: white;
+}
+.btn-primary-vinuu:hover:not(:disabled) {
+  background: linear-gradient(135deg, #6d28d9, #4338ca);
+  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+}
+.btn-primary-bhuu {
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  color: white;
+}
+.btn-primary-bhuu:hover:not(:disabled) {
+  background: linear-gradient(135deg, #d97706, #dc2626);
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+}
+.btn-ghost {
+  background: transparent;
+  color: #94a3b8;
+  border: 1px solid var(--color-border);
+}
+.btn-ghost:hover:not(:disabled) {
+  background: var(--color-bg-elevated);
+  color: #e2e8f0;
+}
+
+/* ── Form inputs ── */
+.input-field {
+  width: 100%;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 0.625rem 0.875rem;
+  color: #e2e8f0;
+  font-size: 0.875rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
+}
+.input-field:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+}
+.input-field.bhuu-focus:focus {
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+}
+.input-field::placeholder {
+  color: #4b5563;
+}
+
+/* ── Select ── */
+select.input-field {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em;
+  padding-right: 2.5rem;
+}
+
+/* ── Toast notification ── */
+.toast-container {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 380px;
+}

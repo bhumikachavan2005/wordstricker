@@ -1,0 +1,352 @@
+// WordStreak — Prisma Schema
+// Local development: SQLite
+// Production: switch datasource provider to "postgresql"
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+// USERS & AUTHENTICATION
+// ─────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique // "vinuu" | "bhuu"
+  passwordHash String
+  displayName  String
+  avatarColor  String   @default("#7C3AED")
+  theme        String   @default("purple") // "purple" | "amber"
+  timezone     String   @default("Asia/Kolkata")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  sessions          Session[]
+  submittedWords    VocabularyWord[]   @relation("WordSubmitter")
+  dailySubmissions  DailyWordSet[]     @relation("SetSubmitter")
+  reviewedSets      DailyWordSet[]     @relation("SetReviewer")
+  dailyProgress     UserDailyProgress[]
+  wordReviews       WordReview[]
+  savedWords        SavedWord[]
+  quizAttempts      QuizAttempt[]
+  achievements      UserAchievement[]
+  notifications     Notification[]
+  streakFreezeTokens StreakFreezeToken[]
+
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+// ─────────────────────────────────────────────
+// VOCABULARY REGISTRY (GLOBAL)
+// ─────────────────────────────────────────────
+
+model VocabularyWord {
+  id              String   @id @default(cuid())
+  word            String   // Original casing
+  normalizedWord  String   @unique // trimmed + lowercase — THE UNIQUE KEY
+  meaning         String
+  pronunciation   String   @default("")
+  partOfSpeech    String   @default("noun")
+  exampleSentence String   @default("")
+  difficulty      String   @default("medium") // easy | medium | hard
+  submittedById   String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  submittedBy   User            @relation("WordSubmitter", fields: [submittedById], references: [id])
+  dailyItems    DailyWordItem[]
+  reviews       WordReview[]
+  savedBy       SavedWord[]
+
+  @@index([normalizedWord])
+  @@map("vocabulary_words")
+}
+
+// ─────────────────────────────────────────────
+// DAILY WORD SETS (WORKFLOW)
+// ─────────────────────────────────────────────
+
+model DailyWordSet {
+  id            String   @id @default(cuid())
+  date          String   @unique // "YYYY-MM-DD" in Asia/Kolkata
+  status        String   @default("draft") // draft | pending_review | published | rejected
+  submittedById String
+  reviewedById  String?
+  publishedAt   DateTime?
+  rejectedReason String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  submittedBy   User            @relation("SetSubmitter", fields: [submittedById], references: [id])
+  reviewedBy    User?           @relation("SetReviewer", fields: [reviewedById], references: [id])
+  items         DailyWordItem[]
+  progress      UserDailyProgress[]
+  streakHistory StreakHistory[]
+
+  @@index([date])
+  @@map("daily_word_sets")
+}
+
+model DailyWordItem {
+  id               String @id @default(cuid())
+  dailyWordSetId   String
+  vocabularyWordId String
+  position         Int    // 1-10
+
+  dailyWordSet   DailyWordSet   @relation(fields: [dailyWordSetId], references: [id], onDelete: Cascade)
+  vocabularyWord VocabularyWord @relation(fields: [vocabularyWordId], references: [id])
+
+  @@unique([dailyWordSetId, position])
+  @@unique([dailyWordSetId, vocabularyWordId])
+  @@map("daily_word_items")
+}
+
+// ─────────────────────────────────────────────
+// USER DAILY PROGRESS
+// ─────────────────────────────────────────────
+
+model UserDailyProgress {
+  id              String    @id @default(cuid())
+  userId          String
+  dailyWordSetId  String
+  date            String    // "YYYY-MM-DD"
+  wordsReviewed   Int       @default(0)
+  quizScore       Int?
+  quizTotal       Int?
+  isLockedIn      Boolean   @default(false)
+  lockedInAt      DateTime?
+  status          String    @default("not_started") // not_started | learning | completed | locked_in
+  lastActivityAt  DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dailyWordSet DailyWordSet @relation(fields: [dailyWordSetId], references: [id])
+
+  @@unique([userId, date])
+  @@map("user_daily_progress")
+}
+
+model WordReview {
+  id               String   @id @default(cuid())
+  userId           String
+  vocabularyWordId String
+  understood       Boolean
+  difficulty       String   @default("medium")
+  reviewedAt       DateTime @default(now())
+
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vocabularyWord VocabularyWord @relation(fields: [vocabularyWordId], references: [id])
+
+  @@index([userId, vocabularyWordId])
+  @@map("word_reviews")
+}
+
+// ─────────────────────────────────────────────
+// QUIZ SYSTEM
+// ─────────────────────────────────────────────
+
+model Quiz {
+  id         String   @id @default(cuid())
+  type       String   // daily | weekly
+  date       String   // "YYYY-MM-DD" for daily, "YYYY-WW" for weekly
+  createdAt  DateTime @default(now())
+
+  questions QuizQuestion[]
+  attempts  QuizAttempt[]
+
+  @@unique([type, date])
+  @@map("quizzes")
+}
+
+model QuizQuestion {
+  id               String @id @default(cuid())
+  quizId           String
+  vocabularyWordId String?
+  questionType     String // multiple_choice | fill_blank | synonym | sentence_build
+  questionText     String
+  correctAnswer    String
+  options          String // JSON array of options
+  explanation      String @default("")
+  position         Int
+
+  quiz     Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@map("quiz_questions")
+}
+
+model QuizAttempt {
+  id          String   @id @default(cuid())
+  userId      String
+  quizId      String
+  answers     String   // JSON: {questionId: answer}
+  score       Int
+  total       Int
+  completedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz Quiz @relation(fields: [quizId], references: [id])
+
+  @@unique([userId, quizId])
+  @@map("quiz_attempts")
+}
+
+// ─────────────────────────────────────────────
+// WORD VAULT (PRIVATE PER USER)
+// ─────────────────────────────────────────────
+
+model SavedWord {
+  id               String    @id @default(cuid())
+  userId           String
+  vocabularyWordId String
+  isFavorited      Boolean   @default(true)
+  privateNotes     String    @default("")
+  masteryLevel     Int       @default(0) // 0-5
+  nextReviewDate   DateTime?
+  reviewInterval   Int       @default(1) // days
+  timesReviewed    Int       @default(0)
+  lastReviewedAt   DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vocabularyWord VocabularyWord @relation(fields: [vocabularyWordId], references: [id])
+
+  @@unique([userId, vocabularyWordId])
+  @@map("saved_words")
+}
+
+// ─────────────────────────────────────────────
+// SHARED STREAK (SINGLETON ROW)
+// ─────────────────────────────────────────────
+
+model SharedStreak {
+  id                  String    @id @default("singleton")
+  currentStreak       Int       @default(0)
+  longestStreak       Int       @default(0)
+  totalSuccessfulDays Int       @default(0)
+  lastSuccessDate     String?   // "YYYY-MM-DD"
+  updatedAt           DateTime  @updatedAt
+
+  @@map("shared_streak")
+}
+
+model StreakHistory {
+  id              String    @id @default(cuid())
+  date            String    @unique // "YYYY-MM-DD"
+  dailyWordSetId  String?
+  vinuuCompleted  Boolean   @default(false)
+  bhuuCompleted   Boolean   @default(false)
+  streakCount     Int       @default(0)
+  frozenUsed      Boolean   @default(false)
+  rescuedUsed     Boolean   @default(false)
+  bothCompleted   Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  dailyWordSet DailyWordSet? @relation(fields: [dailyWordSetId], references: [id])
+
+  @@map("streak_history")
+}
+
+model StreakFreezeToken {
+  id          String    @id @default(cuid())
+  userId      String
+  awardedAt   DateTime  @default(now())
+  awardReason String    @default("milestone")
+  usedAt      DateTime?
+  usedForDate String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("streak_freeze_tokens")
+}
+
+// ─────────────────────────────────────────────
+// ACHIEVEMENTS
+// ─────────────────────────────────────────────
+
+model Achievement {
+  id          String   @id @default(cuid())
+  key         String   @unique // "first_word", "streak_7", etc.
+  name        String
+  description String
+  icon        String   @default("🏆")
+  xpReward    Int      @default(100)
+  category    String   @default("general") // streak | vocab | quiz | special
+  threshold   Int?     // numeric trigger (e.g. streak length)
+  createdAt   DateTime @default(now())
+
+  userAchievements UserAchievement[]
+
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+  userId        String
+  achievementId String
+  awardedAt     DateTime @default(now())
+  xpAwarded     Int
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id])
+
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
+// ─────────────────────────────────────────────
+// NOTIFICATIONS
+// ─────────────────────────────────────────────
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // streak | achievement | word | system
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  actionUrl String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+  @@map("notifications")
+}
+
+// ─────────────────────────────────────────────
+// AI STORIES (ephemeral, not part of word registry)
+// ─────────────────────────────────────────────
+
+model AiStory {
+  id             String   @id @default(cuid())
+  dailyWordSetId String   @unique
+  storyText      String
+  allWordsUsed   Boolean  @default(true)
+  generatedAt    DateTime @default(now())
+  provider       String   @default("gemini")
+
+  @@map("ai_stories")
+}
