@@ -1,3 +1,4 @@
+import "@/lib/edge-shim";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
@@ -30,6 +31,7 @@ export async function GET() {
         database: "disconnected",
         latency: `${latencyMs}ms`,
         error: error instanceof Error ? error.message : "Unknown database error",
+        stack: error instanceof Error ? error.stack : undefined,
         timestamp: new Date().toISOString(),
       },
       { status: 500 }
