@@ -1,6 +1,23 @@
 import fs from "node:fs";
 import fsp from "node:fs/promises";
 
+// Prevent "Code generation from strings disallowed for this context" in Cloudflare Workers
+if (typeof globalThis !== "undefined") {
+  const g = globalThis as unknown as {
+    __zod_globalConfig?: { jitless?: boolean };
+    navigator?: { userAgent?: string };
+  };
+  g.__zod_globalConfig = {
+    ...(g.__zod_globalConfig || {}),
+    jitless: true,
+  };
+  if (typeof g.navigator === "undefined") {
+    g.navigator = { userAgent: "Cloudflare" };
+  } else if (!g.navigator.userAgent) {
+    g.navigator.userAgent = "Cloudflare";
+  }
+}
+
 // Polyfill for Cloudflare Workers / unenv where fs.readdir / fs.promises.readdir throws
 try {
   if (fsp) {
