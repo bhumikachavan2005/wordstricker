@@ -17,6 +17,7 @@
     "db:migrate:prod": "prisma db push",
     "db:seed": "node node_modules/ts-node/dist/bin.js --project tsconfig.seed.json prisma/seed.ts",
     "db:seed:words": "node node_modules/ts-node/dist/bin.js --project tsconfig.seed.json prisma/seed-words.ts",
+    "db:seed:master": "node node_modules/ts-node/dist/bin.js --project tsconfig.seed.json prisma/seed-master-list.ts",
     "db:studio": "node node_modules/prisma/build/index.js studio",
     "db:reset": "node node_modules/prisma/build/index.js migrate reset",
     "db:reset-pw": "node node_modules/ts-node/dist/bin.js --project tsconfig.seed.json prisma/reset-password-cli.ts",
