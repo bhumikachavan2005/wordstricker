@@ -16,7 +16,7 @@ export default async function Home() {
       {/* Logo area */}
       <div className="text-center mb-12 animate-fade-in-up">
         <div className="inline-flex items-center gap-3 mb-6">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-600 to-purple-800 flex items-center justify-center shadow-lg shadow-violet-500/30">
+          <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-violet-600 to-purple-800 flex items-center justify-center shadow-lg shadow-violet-500/30">
             <span className="text-3xl animate-flicker">🔥</span>
           </div>
           <div className="text-left">

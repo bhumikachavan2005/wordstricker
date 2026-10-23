@@ -1,7 +1,7 @@
 "use client";
 
 import { UserProgressSummary } from "@/types";
-import { CheckCircle2, Clock, Lock, Sparkles, BookOpen, Award, ArrowUpRight } from "lucide-react";
+import { CheckCircle2, Clock, Lock, BookOpen, Award, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 
 interface DualUserCardProps {
@@ -22,8 +22,7 @@ export function DualUserCard({
       accent: "from-violet-600 to-purple-800",
       border: "border-violet-500/30",
       glow: "glow-vinuu",
-      badgeColor: "bg-violet-500/20 text-violet-300 border-violet-500/30",
-      barColor: "bg-gradient-to-r from-violet-600 to-purple-400",
+      barColor: "bg-linear-to-r from-violet-600 to-purple-400",
       textGradient: "gradient-text-vinuu",
       tagEmoji: "💜",
     },
@@ -33,8 +32,7 @@ export function DualUserCard({
       accent: "from-amber-500 to-orange-600",
       border: "border-amber-500/30",
       glow: "glow-bhuu",
-      badgeColor: "bg-amber-500/20 text-amber-300 border-amber-500/30",
-      barColor: "bg-gradient-to-r from-amber-500 to-orange-400",
+      barColor: "bg-linear-to-r from-amber-500 to-orange-400",
       textGradient: "gradient-text-bhuu",
       tagEmoji: "🧡",
     },
@@ -75,7 +73,7 @@ export function DualUserCard({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {users.map(({ progress, theme, accent, border, glow, badgeColor, barColor, textGradient, tagEmoji }) => {
+      {users.map(({ progress, theme, accent, border, glow, barColor, textGradient, tagEmoji }) => {
         const isCurrent = progress.username === currentUsername;
         const pct = Math.min(100, Math.round((progress.wordsReviewed / 10) * 100));
 
@@ -89,7 +87,7 @@ export function DualUserCard({
             {/* Header / Avatar */}
             <div className="flex items-start justify-between mb-5">
               <div className="flex items-center gap-3">
-                <div className={`w-12 h-12 rounded-2xl bg-gradient-to-tr ${accent} flex items-center justify-center text-white text-xl font-bold shadow-md`}>
+                <div className={`w-12 h-12 rounded-2xl bg-linear-to-tr ${accent} flex items-center justify-center text-white text-xl font-bold shadow-md`}>
                   {progress.displayName.charAt(0)}
                 </div>
                 <div>

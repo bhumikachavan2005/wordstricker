@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { Navbar } from "@/components/layout/navbar";
 import {
   Bookmark,
@@ -10,8 +10,6 @@ import {
   Star,
   Edit3,
   Check,
-  BookOpen,
-  Filter,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -44,28 +42,32 @@ export default function VaultPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editNoteText, setEditNoteText] = useState("");
 
-  const loadSavedWords = useCallback(async () => {
-    try {
-      const params = new URLSearchParams();
-      if (search) params.set("search", search);
-      if (masteryFilter) params.set("mastery", masteryFilter);
-      if (sortBy) params.set("sortBy", sortBy);
-
-      const res = await fetch(`/api/vault?${params.toString()}`);
-      const json = await res.json();
-      if (json.success) {
-        setWords(json.data.savedWords);
-      }
-    } catch (e) {
-      console.error("Vault load error:", e);
-    } finally {
-      setLoading(false);
-    }
-  }, [search, masteryFilter, sortBy]);
-
   useEffect(() => {
-    loadSavedWords();
-  }, [loadSavedWords]);
+    let ignore = false;
+    async function fetchSavedWords() {
+      try {
+        const params = new URLSearchParams();
+        if (search) params.set("search", search);
+        if (masteryFilter) params.set("mastery", masteryFilter);
+        if (sortBy) params.set("sortBy", sortBy);
+
+        const res = await fetch(`/api/vault?${params.toString()}`);
+        const json = await res.json();
+        if (!ignore && json.success) {
+          setWords(json.data.savedWords);
+        }
+      } catch (e) {
+        if (!ignore) console.error("Vault load error:", e);
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    }
+
+    fetchSavedWords();
+    return () => {
+      ignore = true;
+    };
+  }, [search, masteryFilter, sortBy]);
 
   const speak = (word: string) => {
     if (typeof window !== "undefined" && "speechSynthesis" in window) {

@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { normalizeWord } from "../src/lib/words";
-import { getTodayDateString, getLastNDates } from "../src/lib/dates";
+import { getLastNDates } from "../src/lib/dates";
 
 const prisma = new PrismaClient();
 
@@ -395,7 +395,7 @@ async function seedMasterVocabularyList() {
 
   console.log("\n========================================================");
   console.log("🎉 BUVI Vocabulary Master List Seed Completed Successfully!");
-  console.log(`✨ Total Unique Words Registered in Global Registry: ${totalInDb}`);
+  console.log(`✨ Total Unique Words Registered in Global Registry: ${totalInDb} (${uniqueWordsCreated} newly added)`);
   console.log(`🔄 Known Historical Duplicates Handled/Linked: ${duplicateWordsLinked}`);
   console.log(`🔥 Shared Streak Updated: ${MASTER_DAYS.length} Days Active Streak!`);
   console.log("========================================================\n");

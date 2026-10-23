@@ -12,7 +12,7 @@ import {
   CartesianGrid,
   Legend,
 } from "recharts";
-import { TrendingUp, BarChart3, Activity } from "lucide-react";
+import { Activity } from "lucide-react";
 import { useState } from "react";
 
 interface AnalyticsChartsProps {

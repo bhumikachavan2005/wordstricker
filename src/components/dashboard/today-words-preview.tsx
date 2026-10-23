@@ -5,13 +5,9 @@ import { DailyWordSetWithItems, UserProgressSummary } from "@/types";
 import {
   Volume2,
   Lock,
-  CheckCircle,
   PlusCircle,
   ArrowRight,
   BookOpen,
-  Sparkles,
-  HelpCircle,
-  AlertTriangle,
 } from "lucide-react";
 import Link from "next/link";
 import confetti from "canvas-confetti";
@@ -152,7 +148,7 @@ export function TodayWordsPreview({
                 disabled={!isReadyToLock || isLockingIn}
                 className={`w-full sm:w-auto btn py-3 px-6 text-sm rounded-xl font-bold transition-all ${
                   isReadyToLock
-                    ? "bg-gradient-to-r from-violet-600 via-pink-600 to-amber-500 hover:from-violet-500 hover:to-amber-400 text-white shadow-lg shadow-violet-500/30 hover-lift"
+                    ? "bg-linear-to-r from-violet-600 via-pink-600 to-amber-500 hover:from-violet-500 hover:to-amber-400 text-white shadow-lg shadow-violet-500/30 hover-lift"
                     : "btn-ghost opacity-60 cursor-not-allowed"
                 }`}
               >

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Navbar } from "@/components/layout/navbar";
 import {
   Volume2,
@@ -12,25 +12,29 @@ import {
   HelpCircle,
   Sparkles,
   Lock,
-  ArrowRight,
-  BookOpen,
   RotateCw,
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { Suspense } from "react";
-import { DailyWordSetWithItems, VocabularyWordWithMeta } from "@/types";
+import { DailyWordSetWithItems } from "@/types";
 import Link from "next/link";
 
 function LearnContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
 
   const [loading, setLoading] = useState(true);
   const [todaySet, setTodaySet] = useState<DailyWordSetWithItems | null>(null);
   const [wordsReviewed, setWordsReviewed] = useState(0);
   const [isLockedIn, setIsLockedIn] = useState(false);
 
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(() => {
+    const idx = searchParams.get("index");
+    if (idx !== null) {
+      const num = parseInt(idx, 10);
+      if (!isNaN(num) && num >= 0 && num < 10) return num;
+    }
+    return 0;
+  });
   const [isFlipped, setIsFlipped] = useState(false);
   const [savedWords, setSavedWords] = useState<Record<string, boolean>>({});
   const [reviewedWords, setReviewedWords] = useState<Record<string, boolean>>({});
@@ -41,40 +45,33 @@ function LearnContent() {
   const [storyProvider, setStoryProvider] = useState<string>("");
 
   // Load daily set
-  const loadDailyWords = useCallback(async () => {
-    try {
-      const res = await fetch("/api/dashboard");
-      const data = await res.json();
-      if (data.success) {
-        setTodaySet(data.data.todaySet);
-        const myProg =
-          data.data.currentUser.username === "vinuu"
-            ? data.data.vinuuProgress
-            : data.data.bhuuProgress;
-        setWordsReviewed(myProg.wordsReviewed);
-        setIsLockedIn(myProg.isLockedIn);
-      }
-    } catch (e) {
-      console.error("Failed to load daily words:", e);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
+    let ignore = false;
+    async function loadDailyWords() {
+      try {
+        const res = await fetch("/api/dashboard");
+        const data = await res.json();
+        if (!ignore && data.success) {
+          setTodaySet(data.data.todaySet);
+          const myProg =
+            data.data.currentUser.username === "vinuu"
+              ? data.data.vinuuProgress
+              : data.data.bhuuProgress;
+          setWordsReviewed(myProg.wordsReviewed);
+          setIsLockedIn(myProg.isLockedIn);
+        }
+      } catch (e) {
+        if (!ignore) console.error("Failed to load daily words:", e);
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    }
+
     loadDailyWords();
-  }, [loadDailyWords]);
-
-  // Initial index from URL query param
-  useEffect(() => {
-    const idx = searchParams.get("index");
-    if (idx !== null) {
-      const num = parseInt(idx, 10);
-      if (!isNaN(num) && num >= 0 && num < 10) {
-        setCurrentIndex(num);
-      }
-    }
-  }, [searchParams]);
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   const items = todaySet?.items || [];
   const currentItem = items[currentIndex];
@@ -92,9 +89,11 @@ function LearnContent() {
   };
 
   // Record review in DB
-  const markReviewed = async (wordId: string) => {
-    if (reviewedWords[wordId]) return;
-    setReviewedWords((prev) => ({ ...prev, [wordId]: true }));
+  const markReviewed = useCallback(async (wordId: string) => {
+    setReviewedWords((prev) => {
+      if (prev[wordId]) return prev;
+      return { ...prev, [wordId]: true };
+    });
 
     try {
       const res = await fetch("/api/words/review", {
@@ -116,7 +115,7 @@ function LearnContent() {
     } catch (e) {
       console.error("Failed to record review:", e);
     }
-  };
+  }, []);
 
   // Toggle Vault Bookmark
   const toggleVault = async (wordId: string) => {
@@ -158,20 +157,20 @@ function LearnContent() {
   };
 
   // Navigation handlers
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     if (currentWord) markReviewed(currentWord.id);
     setIsFlipped(false);
     if (currentIndex < items.length - 1) {
       setCurrentIndex((prev) => prev + 1);
     }
-  };
+  }, [currentWord, currentIndex, items.length, markReviewed]);
 
-  const handlePrev = () => {
+  const handlePrev = useCallback(() => {
     setIsFlipped(false);
     if (currentIndex > 0) {
       setCurrentIndex((prev) => prev - 1);
     }
-  };
+  }, [currentIndex]);
 
   // Keyboard navigation shortcuts
   useEffect(() => {
@@ -192,7 +191,7 @@ function LearnContent() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [currentIndex, items.length, currentWord]);
+  }, [currentWord, markReviewed, handleNext, handlePrev]);
 
   if (loading) {
     return (
@@ -286,7 +285,7 @@ function LearnContent() {
           </div>
           <div className="w-full h-2 bg-gray-900 rounded-full overflow-hidden border border-gray-800">
             <div
-              className="h-full bg-gradient-to-r from-violet-600 via-pink-500 to-amber-500 transition-all duration-300"
+              className="h-full bg-linear-to-r from-violet-600 via-pink-500 to-amber-500 transition-all duration-300"
               style={{ width: `${(wordsReviewed / 10) * 100}%` }}
             />
           </div>
@@ -335,7 +334,7 @@ function LearnContent() {
               >
                 {/* ── CARD FRONT ── */}
                 <div
-                  className="absolute inset-0 w-full h-full rounded-2xl p-8 flex flex-col justify-between glass-card bg-gradient-to-br from-gray-900/90 via-gray-900/95 to-violet-950/30 backface-hidden"
+                  className="absolute inset-0 w-full h-full rounded-2xl p-8 flex flex-col justify-between glass-card bg-linear-to-br from-gray-900/90 via-gray-900/95 to-violet-950/30 backface-hidden"
                   style={{ backfaceVisibility: "hidden" }}
                 >
                   <div className="flex items-center justify-between">
@@ -344,6 +343,11 @@ function LearnContent() {
                     </span>
 
                     <div className="flex items-center gap-2">
+                      {reviewedWords[currentWord.id] && (
+                        <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                          <CheckCircle className="w-2.5 h-2.5" /> Reviewed
+                        </span>
+                      )}
                       <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${difficultyColor}`}>
                         {currentWord.difficulty}
                       </span>
@@ -390,7 +394,7 @@ function LearnContent() {
 
                 {/* ── CARD BACK ── */}
                 <div
-                  className="absolute inset-0 w-full h-full rounded-2xl p-8 flex flex-col justify-between glass-card bg-gradient-to-br from-gray-900/95 via-purple-950/20 to-gray-900 backface-hidden"
+                  className="absolute inset-0 w-full h-full rounded-2xl p-8 flex flex-col justify-between glass-card bg-linear-to-br from-gray-900/95 via-purple-950/20 to-gray-900 backface-hidden"
                   style={{
                     backfaceVisibility: "hidden",
                     transform: "rotateY(180deg)",

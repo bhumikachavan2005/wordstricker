@@ -14,8 +14,9 @@ export interface AwardedAchievement {
  */
 export async function checkAndAwardAchievements(
   userId: string,
-  trigger?: string
+  _trigger?: string
 ): Promise<AwardedAchievement[]> {
+  void _trigger;
   const [
     user,
     allAchievements,
@@ -23,7 +24,6 @@ export async function checkAndAwardAchievements(
     streak,
     submittedWordsCount,
     quizzesCompletedCount,
-    perfectQuizCount,
     vaultStarsCount,
     lockInsCount,
     bothLockInsCount,
@@ -34,7 +34,6 @@ export async function checkAndAwardAchievements(
     getSharedStreak(),
     prisma.vocabularyWord.count({ where: { submittedById: userId } }),
     prisma.quizAttempt.count({ where: { userId } }),
-    prisma.quizAttempt.count({ where: { userId, score: { equals: prisma.quizAttempt.fields.total as any } } }).catch(() => 0),
     prisma.savedWord.count({ where: { userId, isFavorited: true } }),
     prisma.userDailyProgress.count({ where: { userId, isLockedIn: true } }),
     prisma.streakHistory.count({ where: { bothCompleted: true } }),

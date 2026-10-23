@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { Navbar } from "@/components/layout/navbar";
 import {
   Trophy,
-  Award,
   Sparkles,
   Lock,
   CheckCircle,
@@ -152,7 +151,7 @@ export default function AchievementsPage() {
                         <div
                           className={`w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-inner ${
                             isUnlocked
-                              ? "bg-gradient-to-br from-amber-500/20 to-purple-500/20 border border-amber-500/40"
+                              ? "bg-linear-to-br from-amber-500/20 to-purple-500/20 border border-amber-500/40"
                               : "bg-gray-800/80 border border-gray-700 text-gray-500"
                           }`}
                         >

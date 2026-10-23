@@ -139,7 +139,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Save or update QuizAttempt
-    const attempt = await prisma.quizAttempt.upsert({
+    await prisma.quizAttempt.upsert({
       where: {
         userId_quizId: {
           userId: session.user.id,

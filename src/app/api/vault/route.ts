@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { z } from "zod";
 
 const VaultActionSchema = z.object({
@@ -22,7 +23,7 @@ export async function GET(req: NextRequest) {
   const sortBy = searchParams.get("sortBy") || "newest"; // newest | oldest | mastery | alpha
 
   try {
-    const whereClause: any = {
+    const whereClause: Prisma.SavedWordWhereInput = {
       userId: session.user.id,
       isFavorited: true,
     };
@@ -40,7 +41,7 @@ export async function GET(req: NextRequest) {
       };
     }
 
-    let orderBy: any = { createdAt: "desc" };
+    let orderBy: Prisma.SavedWordOrderByWithRelationInput = { createdAt: "desc" };
     if (sortBy === "oldest") orderBy = { createdAt: "asc" };
     if (sortBy === "mastery") orderBy = { masteryLevel: "desc" };
     if (sortBy === "alpha") orderBy = { vocabularyWord: { word: "asc" } };
@@ -154,7 +155,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (action === "update") {
-      const updateData: any = {};
+      const updateData: Prisma.SavedWordUpdateInput = {};
       if (privateNotes !== undefined) updateData.privateNotes = privateNotes;
       if (masteryLevel !== undefined) updateData.masteryLevel = masteryLevel;
 

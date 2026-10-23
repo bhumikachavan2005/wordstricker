@@ -49,8 +49,8 @@ export function Navbar({ currentStreak = 0 }: NavbarProps) {
   const userColor = isVinuu ? "text-violet-400" : "text-amber-400";
   const userGlow = isVinuu ? "hover-glow-vinuu" : "hover-glow-bhuu";
   const avatarBg = isVinuu
-    ? "bg-gradient-to-tr from-violet-600 to-purple-800"
-    : "bg-gradient-to-tr from-amber-500 to-orange-600";
+    ? "bg-linear-to-tr from-violet-600 to-purple-800"
+    : "bg-linear-to-tr from-amber-500 to-orange-600";
 
   const navLinks = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -73,7 +73,7 @@ export function Navbar({ currentStreak = 0 }: NavbarProps) {
           setNotifications(json.data.notifications || []);
           setUnreadCount(json.data.unreadCount || 0);
         }
-      } catch (e) {
+      } catch {
         // quiet catch
       }
     }
@@ -119,7 +119,7 @@ export function Navbar({ currentStreak = 0 }: NavbarProps) {
           {/* Logo & Brand */}
           <div className="flex items-center gap-3">
             <Link href="/dashboard" className="flex items-center gap-2.5 group">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-amber-500 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform duration-200">
+              <div className="w-10 h-10 rounded-xl bg-linear-to-br from-violet-600 to-amber-500 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform duration-200">
                 <span className="text-xl animate-flicker">🔥</span>
               </div>
               <div className="flex flex-col">
@@ -135,7 +135,7 @@ export function Navbar({ currentStreak = 0 }: NavbarProps) {
             {/* Streak indicator badge */}
             <Link
               href="/dashboard#streak"
-              className="ml-2 flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-orange-500/10 to-amber-500/10 border border-orange-500/30 hover:border-orange-500/50 transition-all text-xs font-semibold text-amber-300"
+              className="ml-2 flex items-center gap-1.5 px-3 py-1 rounded-full bg-linear-to-r from-orange-500/10 to-amber-500/10 border border-orange-500/30 hover:border-orange-500/50 transition-all text-xs font-semibold text-amber-300"
               title="Daily Mutual Streak"
             >
               <Flame className="w-4 h-4 text-orange-400 fill-orange-400 animate-pulse" />

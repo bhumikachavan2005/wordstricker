@@ -72,7 +72,7 @@ export async function GET(req: NextRequest) {
 
     // Attempt generation via AI provider
     const wordList = dailySet.items.map((i) => i.vocabularyWord.word);
-    let storyResult = await generateContextStory(wordList);
+    const storyResult = await generateContextStory(wordList);
 
     let finalStory: string;
     let providerName: string;

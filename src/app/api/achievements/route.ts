@@ -9,15 +9,13 @@ export async function GET() {
   }
 
   try {
-    const [allAchievements, userAchievements, vinuu, bhuu] = await Promise.all([
+    const [allAchievements, userAchievements] = await Promise.all([
       prisma.achievement.findMany({
         orderBy: [{ category: "asc" }, { xpReward: "asc" }],
       }),
       prisma.userAchievement.findMany({
         include: { user: { select: { username: true, displayName: true } } },
       }),
-      prisma.user.findUnique({ where: { username: "vinuu" } }),
-      prisma.user.findUnique({ where: { username: "bhuu" } }),
     ]);
 
     const unlockedMap: Record<string, { vinuu: boolean; bhuu: boolean; vinuuDate?: string; bhuuDate?: string }> = {};

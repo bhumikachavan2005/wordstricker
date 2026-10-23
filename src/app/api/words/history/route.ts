@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 
 export async function GET(req: NextRequest) {
   const session = await auth();
@@ -72,7 +73,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Default: Return individual vocabulary words
-    const whereClause: any = {};
+    const whereClause: Prisma.VocabularyWordWhereInput = {};
 
     if (search) {
       whereClause.OR = [

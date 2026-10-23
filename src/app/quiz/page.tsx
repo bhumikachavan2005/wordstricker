@@ -10,7 +10,6 @@ import {
   RotateCcw,
   Sparkles,
   Trophy,
-  Award,
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import Link from "next/link";
@@ -55,30 +54,38 @@ export default function QuizPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionResult, setSubmissionResult] = useState<QuizSubmissionResult | null>(null);
 
-  const loadQuiz = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch("/api/quiz");
-      const json = await res.json();
-      if (json.success) {
-        setQuizData(json.data);
-        if (json.data.previousAttempt) {
-          setAnswers(json.data.previousAttempt.answers || {});
-        }
-      } else {
-        setError(json.error || "Failed to load quiz");
-      }
-    } catch (e) {
-      console.error(e);
-      setError("An error occurred while loading today's quiz.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    loadQuiz();
+    let ignore = false;
+    async function fetchQuiz() {
+      try {
+        const res = await fetch("/api/quiz");
+        const json = await res.json();
+        if (!ignore) {
+          if (json.success) {
+            setQuizData(json.data);
+            if (json.data.previousAttempt) {
+              setAnswers(json.data.previousAttempt.answers || {});
+            }
+          } else {
+            setError(json.error || "Failed to load quiz");
+          }
+        }
+      } catch (e) {
+        if (!ignore) {
+          console.error(e);
+          setError("An error occurred while loading today's quiz.");
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    }
+
+    fetchQuiz();
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   const selectAnswer = (questionId: string, option: string) => {
@@ -198,7 +205,7 @@ export default function QuizPage() {
           <div className="space-y-6 animate-fade-in-up">
             {/* Score Banner */}
             <div className="glass-card p-8 text-center border-amber-500/40 relative overflow-hidden">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-500/20 to-purple-500/20 border border-amber-500/40 flex items-center justify-center mx-auto mb-4">
+              <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-amber-500/20 to-purple-500/20 border border-amber-500/40 flex items-center justify-center mx-auto mb-4">
                 <Trophy className="w-10 h-10 text-amber-400 animate-bounce-subtle" />
               </div>
 
@@ -316,7 +323,7 @@ export default function QuizPage() {
               </div>
               <div className="w-full h-1.5 bg-gray-900 rounded-full overflow-hidden border border-gray-800">
                 <div
-                  className="h-full bg-gradient-to-r from-amber-500 to-violet-500 transition-all duration-300"
+                  className="h-full bg-linear-to-r from-amber-500 to-violet-500 transition-all duration-300"
                   style={{ width: `${((currentStep + 1) / totalQ) * 100}%` }}
                 />
               </div>

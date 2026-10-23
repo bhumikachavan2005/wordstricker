@@ -108,7 +108,7 @@ function ResetPasswordContent() {
       <div className="glass-card p-6 sm:p-8 w-full max-w-lg mx-auto shadow-2xl border-gray-800 animate-fade-in-up">
         {/* Header */}
         <div className="text-center mb-6">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-600 to-amber-500 flex items-center justify-center mx-auto mb-3 shadow-md">
+          <div className="w-12 h-12 rounded-2xl bg-linear-to-br from-violet-600 to-amber-500 flex items-center justify-center mx-auto mb-3 shadow-md">
             <ShieldCheck className="w-6 h-6 text-white" />
           </div>
           <h2 className="text-2xl font-bold font-outfit text-white">

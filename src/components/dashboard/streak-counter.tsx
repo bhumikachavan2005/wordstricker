@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Flame, Shield, Trophy, CheckCircle, Calendar, Sparkles } from "lucide-react";
+import { Shield, CheckCircle, Calendar, Sparkles } from "lucide-react";
 import confetti from "canvas-confetti";
 
 interface StreakCounterProps {
@@ -61,7 +61,7 @@ export function StreakCounter({
       <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
         {/* Streak Main Display */}
         <div className="flex items-center gap-5 cursor-pointer" onClick={triggerStreakCelebration} title="Click for celebratory fireworks!">
-          <div className="relative flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-500/20 via-orange-500/20 to-red-500/20 border border-amber-500/40 shadow-inner group-hover:scale-105 transition-transform duration-300">
+          <div className="relative flex items-center justify-center w-20 h-20 rounded-2xl bg-linear-to-br from-amber-500/20 via-orange-500/20 to-red-500/20 border border-amber-500/40 shadow-inner group-hover:scale-105 transition-transform duration-300">
             <span className="text-5xl animate-flicker">🔥</span>
             <div className="absolute -bottom-1 -right-1 bg-amber-400 text-black font-extrabold text-[10px] px-1.5 py-0.5 rounded-full shadow">
               ACTIVE
@@ -102,7 +102,7 @@ export function StreakCounter({
                     title={`${day.date}: ${day.completed ? "Both completed!" : "Incomplete"}`}
                     className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all ${
                       day.completed
-                        ? "bg-gradient-to-tr from-emerald-500 to-teal-400 text-black shadow-md shadow-emerald-500/20"
+                        ? "bg-linear-to-tr from-emerald-500 to-teal-400 text-black shadow-md shadow-emerald-500/20"
                         : "bg-gray-800/80 border border-gray-700 text-gray-600"
                     }`}
                   >

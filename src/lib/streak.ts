@@ -110,7 +110,8 @@ export async function recalculateSharedStreak(): Promise<{
  * Try to update the streak history for today after a lock-in.
  * This is idempotent — safe to call multiple times.
  */
-export async function tryUpdateTodayStreak(userId: string): Promise<void> {
+export async function tryUpdateTodayStreak(_userId?: string): Promise<void> {
+  void _userId;
   const timezone = process.env.APP_TIMEZONE || "Asia/Kolkata";
   const today = getTodayDateString(timezone);
 

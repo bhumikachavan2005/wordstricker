@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { Navbar } from "@/components/layout/navbar";
 import {
   Archive,
@@ -8,13 +8,31 @@ import {
   Volume2,
   Bookmark,
   Calendar,
-  Filter,
-  User,
-  Layers,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import Link from "next/link";
+
+interface HistoryWordItem {
+  id: string;
+  word: string;
+  meaning: string;
+  pronunciation?: string;
+  partOfSpeech?: string;
+  exampleSentence?: string;
+  difficulty?: "easy" | "medium" | "hard";
+  submittedBy?: string;
+  submittedByUsername?: string;
+  submitterName?: string;
+  isSaved?: boolean;
+}
+
+interface HistorySetItem {
+  id: string;
+  date: string;
+  wordCount: number;
+  submitterName: string;
+  words: HistoryWordItem[];
+}
 
 export default function HistoryPage() {
   const [mode, setMode] = useState<"words" | "days">("words");
@@ -27,48 +45,52 @@ export default function HistoryPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
 
-  const [words, setWords] = useState<any[]>([]);
-  const [sets, setSets] = useState<any[]>([]);
+  const [words, setWords] = useState<HistoryWordItem[]>([]);
+  const [sets, setSets] = useState<HistorySetItem[]>([]);
   const [savedStatus, setSavedStatus] = useState<Record<string, boolean>>({});
 
-  const loadData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams();
-      params.set("mode", mode);
-      params.set("page", page.toString());
-      params.set("limit", "18");
-      if (search) params.set("search", search);
-      if (contributor) params.set("contributor", contributor);
-      if (difficulty) params.set("difficulty", difficulty);
-      if (pos) params.set("pos", pos);
-
-      const res = await fetch(`/api/words/history?${params.toString()}`);
-      const json = await res.json();
-      if (json.success) {
-        setTotalPages(json.data.totalPages || 1);
-        setTotalCount(json.data.total || 0);
-        if (mode === "words") {
-          setWords(json.data.words || []);
-          const statusMap: Record<string, boolean> = {};
-          (json.data.words || []).forEach((w: any) => {
-            statusMap[w.id] = w.isSaved;
-          });
-          setSavedStatus(statusMap);
-        } else {
-          setSets(json.data.sets || []);
-        }
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  }, [mode, page, search, contributor, difficulty, pos]);
-
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    let ignore = false;
+    async function fetchData() {
+      try {
+        const params = new URLSearchParams();
+        params.set("mode", mode);
+        params.set("page", page.toString());
+        params.set("limit", "18");
+        if (search) params.set("search", search);
+        if (contributor) params.set("contributor", contributor);
+        if (difficulty) params.set("difficulty", difficulty);
+        if (pos) params.set("pos", pos);
+
+        const res = await fetch(`/api/words/history?${params.toString()}`);
+        const json = await res.json();
+        if (!ignore && json.success) {
+          setTotalPages(json.data.totalPages || 1);
+          setTotalCount(json.data.total || 0);
+          if (mode === "words") {
+            const fetchedWords: HistoryWordItem[] = json.data.words || [];
+            setWords(fetchedWords);
+            const statusMap: Record<string, boolean> = {};
+            fetchedWords.forEach((w) => {
+              statusMap[w.id] = !!w.isSaved;
+            });
+            setSavedStatus(statusMap);
+          } else {
+            setSets((json.data.sets as HistorySetItem[]) || []);
+          }
+        }
+      } catch (e) {
+        if (!ignore) console.error(e);
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    }
+
+    fetchData();
+    return () => {
+      ignore = true;
+    };
+  }, [mode, page, search, contributor, difficulty, pos]);
 
   const speak = (word: string) => {
     if (typeof window !== "undefined" && "speechSynthesis" in window) {
@@ -321,7 +343,7 @@ export default function HistoryPage() {
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-                    {set.words.map((w: any, idx: number) => (
+                    {set.words.map((w: HistoryWordItem, idx: number) => (
                       <div
                         key={w.id || idx}
                         className="bg-gray-900/80 p-3 rounded-xl border border-gray-800"

@@ -1,16 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/layout/navbar";
 import {
   PlusCircle,
-  Sparkles,
   AlertCircle,
   CheckCircle2,
   Trash2,
   Send,
-  HelpCircle,
   Wand2,
 } from "lucide-react";
 import confetti from "canvas-confetti";
@@ -237,7 +235,7 @@ export default function SubmitWordsPage() {
         // If duplicates returned, highlight them
         if (data.details?.duplicates) {
           const updatedStatuses = [...validationStatuses];
-          data.details.duplicates.forEach((dup: any) => {
+          data.details.duplicates.forEach((dup: { normalizedWord: string; message: string }) => {
             const idx = words.findIndex(
               (w) => w.word.trim().toLowerCase() === dup.normalizedWord
             );
@@ -321,7 +319,7 @@ export default function SubmitWordsPage() {
             </span>
             <div className="w-32 sm:w-48 h-2 bg-gray-900 rounded-full overflow-hidden border border-gray-800">
               <div
-                className="h-full bg-gradient-to-r from-amber-500 to-violet-500 transition-all duration-300"
+                className="h-full bg-linear-to-r from-amber-500 to-violet-500 transition-all duration-300"
                 style={{ width: `${(filledCount / 10) * 100}%` }}
               />
             </div>
@@ -451,7 +449,7 @@ export default function SubmitWordsPage() {
                     <select
                       value={wordItem.difficulty}
                       onChange={(e) =>
-                        updateWordField(index, "difficulty", e.target.value as any)
+                        updateWordField(index, "difficulty", e.target.value as "easy" | "medium" | "hard")
                       }
                       className="input-field text-sm"
                     >
@@ -511,7 +509,7 @@ export default function SubmitWordsPage() {
               disabled={isSubmitting || filledCount < 10}
               className={`btn py-3.5 px-8 rounded-xl font-bold text-sm flex items-center gap-2 ${
                 filledCount >= 10
-                  ? "bg-gradient-to-r from-violet-600 to-amber-500 hover:from-violet-500 hover:to-amber-400 text-white shadow-lg hover-lift"
+                  ? "bg-linear-to-r from-violet-600 to-amber-500 hover:from-violet-500 hover:to-amber-400 text-white shadow-lg hover-lift"
                   : "btn-ghost opacity-50 cursor-not-allowed"
               }`}
             >

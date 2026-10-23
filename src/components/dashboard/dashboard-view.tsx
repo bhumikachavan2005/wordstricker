@@ -7,7 +7,7 @@ import { StreakCounter } from "@/components/dashboard/streak-counter";
 import { DualUserCard } from "@/components/dashboard/dual-user-card";
 import { TodayWordsPreview } from "@/components/dashboard/today-words-preview";
 import { AnalyticsCharts } from "@/components/dashboard/analytics-charts";
-import { Trophy, Sparkles, BookOpen, Clock, Calendar } from "lucide-react";
+import { Trophy, Sparkles, Calendar } from "lucide-react";
 import Link from "next/link";
 
 interface DashboardViewProps {

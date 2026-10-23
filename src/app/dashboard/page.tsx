@@ -5,7 +5,7 @@ import { getTodayDateString, getLastNDates } from "@/lib/dates";
 import { getSharedStreak } from "@/lib/streak";
 import { levelFromXp } from "@/lib/utils";
 import { DashboardView } from "@/components/dashboard/dashboard-view";
-import { DashboardData } from "@/types";
+import { DashboardData, ProgressStatus, DailySetStatus } from "@/types";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -107,11 +107,15 @@ export default async function DashboardPage() {
     orderBy: { date: "asc" },
   });
 
-  let cumulativeCount = 0;
-  const wordsOverTime = publishedSets.map((set) => {
-    cumulativeCount += set._count.items;
-    return { date: set.date, count: set._count.items, cumulative: cumulativeCount };
-  });
+  const wordsOverTime = publishedSets.reduce<Array<{ date: string; count: number; cumulative: number }>>((acc, set) => {
+    const prevCumulative = acc.length > 0 ? acc[acc.length - 1].cumulative : 0;
+    acc.push({
+      date: set.date,
+      count: set._count.items,
+      cumulative: prevCumulative + set._count.items,
+    });
+    return acc;
+  }, []);
 
   // Analytics: quiz accuracy (last 30 days)
   const [vinuuQuizAttempts, bhuuQuizAttempts] = await Promise.all([
@@ -170,7 +174,7 @@ export default async function DashboardPage() {
       quizAccuracy: quizAcc,
       isLockedIn: progress?.isLockedIn ?? false,
       lockedInAt: progress?.lockedInAt?.toISOString() ?? null,
-      status: (progress?.status as any) ?? "not_started",
+      status: (progress?.status as ProgressStatus) ?? "not_started",
       lastActivityAt: progress?.lastActivityAt?.toISOString() ?? null,
       xp,
       level,
@@ -212,7 +216,7 @@ export default async function DashboardPage() {
       ? {
           id: todaySet.id,
           date: todaySet.date,
-          status: todaySet.status as any,
+          status: todaySet.status as DailySetStatus,
           submittedById: todaySet.submittedById,
           submitterName: todaySet.submittedBy.displayName,
           reviewedById: todaySet.reviewedById,
@@ -228,7 +232,7 @@ export default async function DashboardPage() {
               pronunciation: item.vocabularyWord.pronunciation,
               partOfSpeech: item.vocabularyWord.partOfSpeech,
               exampleSentence: item.vocabularyWord.exampleSentence,
-              difficulty: item.vocabularyWord.difficulty as any,
+              difficulty: item.vocabularyWord.difficulty as "easy" | "medium" | "hard",
               submittedById: item.vocabularyWord.submittedById,
               submitterName: item.vocabularyWord.submittedBy.displayName,
               createdAt: item.vocabularyWord.createdAt.toISOString(),
