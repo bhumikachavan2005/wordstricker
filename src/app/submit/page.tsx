@@ -172,13 +172,18 @@ export default function SubmitWordsPage() {
       const data = await res.json();
 
       const updated = [...validationStatuses];
-      if (data.success && data.data.valid) {
+      if (data.success && (data.data?.valid || data.data?.isValid)) {
         updated[index] = { status: "valid", message: "Unique & available! ✨" };
       } else if (data.data?.duplicates?.length > 0) {
         const dup = data.data.duplicates[0];
         updated[index] = {
           status: "duplicate",
           message: dup.message || "Already in the database!",
+        };
+      } else if (data.data?.errors && data.data.errors[1]?.length > 0) {
+        updated[index] = {
+          status: "duplicate",
+          message: data.data.errors[1][0],
         };
       }
       setValidationStatuses(updated);

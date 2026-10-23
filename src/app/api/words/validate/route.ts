@@ -6,15 +6,15 @@ import { z } from "zod";
 
 const WordSchema = z.object({
   word: z.string().min(1),
-  meaning: z.string().min(1, "Meaning is required"),
-  pronunciation: z.string().default(""),
-  partOfSpeech: z.enum(["noun", "verb", "adjective", "adverb", "pronoun", "preposition", "conjunction", "interjection", "determiner"]),
-  exampleSentence: z.string().default(""),
-  difficulty: z.enum(["easy", "medium", "hard"]),
+  meaning: z.string().optional().default(""),
+  pronunciation: z.string().optional().default(""),
+  partOfSpeech: z.string().optional().default("noun"),
+  exampleSentence: z.string().optional().default(""),
+  difficulty: z.string().optional().default("medium"),
 });
 
 const ValidateSchema = z.object({
-  words: z.array(WordSchema).length(REQUIRED_WORDS_PER_DAY),
+  words: z.array(WordSchema).min(1).max(REQUIRED_WORDS_PER_DAY),
 });
 
 /**
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
       errors[position] = errors[position] || [];
       errors[position].push(validation.error!);
     }
-    if (!w.meaning.trim()) {
+    if (words.length === REQUIRED_WORDS_PER_DAY && !w.meaning.trim()) {
       errors[position] = errors[position] || [];
       errors[position].push("Meaning is required.");
     }
@@ -105,6 +105,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     success: true,
     data: {
+      valid: isValid,
       isValid,
       errors,
       duplicates: duplicateInfos,

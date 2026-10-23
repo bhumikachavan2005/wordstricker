@@ -77,7 +77,8 @@ export type PartOfSpeech =
   | "preposition"
   | "conjunction"
   | "interjection"
-  | "determiner";
+  | "determiner"
+  | "idiom";
 
 export const PARTS_OF_SPEECH: PartOfSpeech[] = [
   "noun",
@@ -89,6 +90,7 @@ export const PARTS_OF_SPEECH: PartOfSpeech[] = [
   "conjunction",
   "interjection",
   "determiner",
+  "idiom",
 ];
 
 export type Difficulty = "easy" | "medium" | "hard";

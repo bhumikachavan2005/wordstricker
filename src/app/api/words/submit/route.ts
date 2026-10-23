@@ -9,7 +9,7 @@ const WordSchema = z.object({
   word: z.string().min(1),
   meaning: z.string().min(1),
   pronunciation: z.string().default(""),
-  partOfSpeech: z.enum(["noun", "verb", "adjective", "adverb", "pronoun", "preposition", "conjunction", "interjection", "determiner"]),
+  partOfSpeech: z.enum(["noun", "verb", "adjective", "adverb", "pronoun", "preposition", "conjunction", "interjection", "determiner", "idiom"]),
   exampleSentence: z.string().default(""),
   difficulty: z.enum(["easy", "medium", "hard"]),
 });
@@ -17,6 +17,7 @@ const WordSchema = z.object({
 const SubmitSchema = z.object({
   words: z.array(WordSchema).length(REQUIRED_WORDS_PER_DAY),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  publishImmediately: z.boolean().optional(),
 });
 
 /**
@@ -129,10 +130,12 @@ export async function POST(req: NextRequest) {
       );
 
       // Create the DailyWordSet
+      const isAutoPublish = parsed.data.publishImmediately ?? true;
       const dailySet = await tx.dailyWordSet.create({
         data: {
           date: today,
-          status: "draft",
+          status: isAutoPublish ? "published" : "draft",
+          publishedAt: isAutoPublish ? new Date() : null,
           submittedById: session.user.id,
           items: {
             create: wordRecords.map((record, idx) => ({
@@ -155,7 +158,9 @@ export async function POST(req: NextRequest) {
         id: result.id,
         date: result.date,
         status: result.status,
-        message: "Word list submitted successfully. Ready for review.",
+        message: result.status === "published"
+          ? "Word list submitted and published successfully for today!"
+          : "Word list submitted successfully. Ready for review.",
       },
     });
   } catch (error: unknown) {
