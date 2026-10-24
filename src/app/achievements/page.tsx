@@ -142,7 +142,7 @@ export default function AchievementsPage() {
                   className={`glass-card p-5 border transition-all duration-300 flex flex-col justify-between ${
                     isUnlocked
                       ? "border-amber-500/30 bg-amber-950/10 hover-lift"
-                      : "border-gray-800/80 opacity-60 grayscale-[40%]"
+                      : "border-gray-800/80 opacity-60 grayscale-40"
                   }`}
                 >
                   <div>

@@ -322,7 +322,7 @@ function LearnContent() {
                 setIsFlipped(!isFlipped);
                 markReviewed(currentWord.id);
               }}
-              className="relative w-full h-[360px] sm:h-[400px] cursor-pointer group"
+              className="relative w-full h-90 sm:h-100 cursor-pointer group"
               style={{ perspective: "1200px" }}
             >
               <div
