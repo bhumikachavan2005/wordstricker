@@ -119,6 +119,7 @@ export default function SubmitWordsPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [publishImmediately, setPublishImmediately] = useState(true);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   // Update a field for a word at index
   const updateWordField = (index: number, field: keyof WordFormData, value: string) => {
@@ -190,10 +191,41 @@ export default function SubmitWordsPage() {
     }
   };
 
-  // Fill with sample words for effortless testing or quick study sessions
-  const fillSampleWords = () => {
-    setWords(SAMPLE_WORDS_COLLECTION.map((w) => ({ ...w })));
-    setValidationStatuses(Array.from({ length: 10 }, () => ({ status: "idle" })));
+  // Fill with 10 completely fresh, unique words generated via API (Gemini + Curated Reservoir)
+  const fillSampleWords = async () => {
+    setIsGenerating(true);
+    setErrorMessage(null);
+    try {
+      const res = await fetch("/api/words/generate-samples");
+      const json = await res.json();
+      if (json.success && Array.isArray(json.data?.words) && json.data.words.length === 10) {
+        const freshWords: WordFormData[] = json.data.words.map((w: WordFormData) => ({
+          word: w.word,
+          meaning: w.meaning,
+          pronunciation: w.pronunciation || "",
+          partOfSpeech: w.partOfSpeech || "noun",
+          exampleSentence: w.exampleSentence || "",
+          difficulty: w.difficulty || "medium",
+        }));
+        setWords(freshWords);
+        setValidationStatuses(
+          Array.from({ length: 10 }, () => ({
+            status: "valid",
+            message: "Unique & available",
+          }))
+        );
+      } else {
+        // Fallback to static sample if API returns unexpected format
+        setWords(SAMPLE_WORDS_COLLECTION.map((w) => ({ ...w })));
+        setValidationStatuses(Array.from({ length: 10 }, () => ({ status: "idle" })));
+      }
+    } catch (e) {
+      console.error("Error generating sample words:", e);
+      setWords(SAMPLE_WORDS_COLLECTION.map((w) => ({ ...w })));
+      setValidationStatuses(Array.from({ length: 10 }, () => ({ status: "idle" })));
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   // Clear all fields
@@ -293,11 +325,21 @@ export default function SubmitWordsPage() {
             <button
               type="button"
               onClick={fillSampleWords}
-              className="btn btn-ghost text-xs py-2 px-3 rounded-lg border-violet-500/30 text-violet-300 hover:bg-violet-950/30"
-              title="Auto-fill with 10 high-yield vocabulary words"
+              disabled={isGenerating}
+              className="btn btn-ghost text-xs py-2 px-3 rounded-lg border-violet-500/30 text-violet-300 hover:bg-violet-950/30 transition-all flex items-center gap-1.5"
+              title="Generate 10 completely fresh, unique words"
             >
-              <Wand2 className="w-3.5 h-3.5" />
-              Quick Fill Sample Words
+              {isGenerating ? (
+                <>
+                  <div className="w-3.5 h-3.5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+                  <span>Generating 10 Fresh Words...</span>
+                </>
+              ) : (
+                <>
+                  <Wand2 className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Quick Fill 10 Fresh Words</span>
+                </>
+              )}
             </button>
             <button
               type="button"
