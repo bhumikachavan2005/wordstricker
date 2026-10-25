@@ -44,6 +44,33 @@ export function Navbar({ currentStreak = 0 }: NavbarProps) {
   const [unreadCount, setUnreadCount] = useState(0);
   const notificationRef = useRef<HTMLDivElement>(null);
 
+  // Live streak fallback for pages where currentStreak isn't passed as prop
+  const [fetchedStreak, setFetchedStreak] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (currentStreak > 0) return;
+    if (!session?.user?.id) return;
+
+    let ignore = false;
+    async function fetchLiveStreak() {
+      try {
+        const res = await fetch("/api/streak");
+        const json = await res.json();
+        if (!ignore && json.success && typeof json.data?.currentStreak === "number") {
+          setFetchedStreak(json.data.currentStreak);
+        }
+      } catch {
+        // quiet catch
+      }
+    }
+    fetchLiveStreak();
+    return () => {
+      ignore = true;
+    };
+  }, [currentStreak, session?.user?.id]);
+
+  const liveStreak = currentStreak > 0 ? currentStreak : (fetchedStreak ?? 0);
+
   const username = session?.user?.username || "";
   const isVinuu = username === "vinuu";
   const userColor = isVinuu ? "text-violet-400" : "text-amber-400";
@@ -139,7 +166,7 @@ export function Navbar({ currentStreak = 0 }: NavbarProps) {
               title="Daily Mutual Streak"
             >
               <Flame className="w-4 h-4 text-orange-400 fill-orange-400 animate-pulse" />
-              <span>{currentStreak} Day{currentStreak === 1 ? "" : "s"}</span>
+              <span>{liveStreak} Day{liveStreak === 1 ? "" : "s"}</span>
             </Link>
           </div>
 

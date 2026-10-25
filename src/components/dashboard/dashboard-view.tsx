@@ -7,7 +7,7 @@ import { StreakCounter } from "@/components/dashboard/streak-counter";
 import { DualUserCard } from "@/components/dashboard/dual-user-card";
 import { TodayWordsPreview } from "@/components/dashboard/today-words-preview";
 import { AnalyticsCharts } from "@/components/dashboard/analytics-charts";
-import { Trophy, Sparkles, Calendar } from "lucide-react";
+import { Trophy, Sparkles, Calendar, BookOpen, Check } from "lucide-react";
 import Link from "next/link";
 
 interface DashboardViewProps {
@@ -66,13 +66,36 @@ export function DashboardView({ initialData }: DashboardViewProps) {
           </div>
 
           <div className="flex items-center gap-3">
-            <Link
-              href="/submit"
-              className="btn btn-primary-bhuu text-xs py-2.5 px-4 rounded-xl font-semibold shadow-md"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              Submit Today&apos;s Words
-            </Link>
+            {!data.todaySet ? (
+              <Link
+                href="/submit"
+                className="btn btn-primary-bhuu text-xs py-2.5 px-4 rounded-xl font-semibold shadow-md flex items-center gap-1.5"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                Submit Today&apos;s Words
+              </Link>
+            ) : currentUserProgress.isLockedIn ? (
+              <span className="inline-flex items-center gap-1.5 text-xs py-2 px-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-semibold shadow-sm">
+                <Check className="w-3.5 h-3.5 text-emerald-400" />
+                Today&apos;s Streak Locked In!
+              </span>
+            ) : currentUserProgress.wordsReviewed >= 10 ? (
+              <a
+                href="#today-words"
+                className="btn text-xs py-2.5 px-4 rounded-xl font-semibold shadow-md bg-linear-to-r from-violet-600 via-pink-600 to-amber-500 hover:from-violet-500 hover:to-amber-400 text-white flex items-center gap-1.5 animate-pulse"
+              >
+                <span>⚡</span>
+                Lock In Today&apos;s Streak!
+              </a>
+            ) : (
+              <Link
+                href="/learn"
+                className="btn text-xs py-2.5 px-4 rounded-xl font-semibold shadow-md bg-linear-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white flex items-center gap-1.5"
+              >
+                <BookOpen className="w-3.5 h-3.5" />
+                Continue Learning ({currentUserProgress.wordsReviewed}/10)
+              </Link>
+            )}
 
             <button
               onClick={refreshData}
@@ -115,7 +138,7 @@ export function DashboardView({ initialData }: DashboardViewProps) {
         </section>
 
         {/* 3. Today's 10 Words & Lock-In Hub */}
-        <section>
+        <section id="today-words">
           <TodayWordsPreview
             todaySet={data.todaySet}
             currentUserProgress={currentUserProgress}

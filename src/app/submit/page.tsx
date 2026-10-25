@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Navbar } from "@/components/layout/navbar";
 import {
   PlusCircle,
@@ -10,6 +11,9 @@ import {
   Trash2,
   Send,
   Wand2,
+  Sparkles,
+  BookOpen,
+  LayoutDashboard,
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { WordFormData } from "@/types";
@@ -120,6 +124,42 @@ export default function SubmitWordsPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [publishImmediately, setPublishImmediately] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
+
+  // Check if today's set is already published
+  const [alreadyPublished, setAlreadyPublished] = useState<{
+    date: string;
+    submitterName: string;
+    isCurrentUser: boolean;
+  } | null>(null);
+
+  useEffect(() => {
+    let ignore = false;
+    async function checkTodayPublished() {
+      try {
+        const res = await fetch("/api/dashboard");
+        const json = await res.json();
+        if (!ignore && json.success && json.data?.todaySet) {
+          const submitter =
+            json.data.todaySet.submittedBy?.displayName ||
+            json.data.todaySet.submittedBy?.username ||
+            "Your partner";
+          const currentUsername = json.data.currentUser?.username;
+          const submitterUsername = json.data.todaySet.submittedBy?.username;
+          setAlreadyPublished({
+            date: json.data.todaySet.date,
+            submitterName: submitter,
+            isCurrentUser: currentUsername === submitterUsername,
+          });
+        }
+      } catch (e) {
+        console.error("Error checking today's published status:", e);
+      }
+    }
+    checkTodayPublished();
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   // Update a field for a word at index
   const updateWordField = (index: number, field: keyof WordFormData, value: string) => {
@@ -353,6 +393,43 @@ export default function SubmitWordsPage() {
           </div>
         </div>
 
+        {/* Already Published Educational Notice */}
+        {alreadyPublished && (
+          <div className="glass-card p-6 border-amber-500/30 bg-gradient-to-r from-amber-950/40 via-purple-950/20 to-gray-900/60 rounded-2xl shadow-xl space-y-4 animate-fade-in-up">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center shrink-0">
+                <Sparkles className="w-5 h-5 text-amber-400" />
+              </div>
+              <div className="space-y-1">
+                <h2 className="text-base sm:text-lg font-bold font-outfit text-white">
+                  Today&apos;s 10 Words Have Already Been Published!
+                </h2>
+                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                  {alreadyPublished.isCurrentUser
+                    ? `You have already published today's 10 words (${alreadyPublished.date})!`
+                    : `${alreadyPublished.submitterName} has already published today's 10 vocabulary words (${alreadyPublished.date})!`}
+                  {" "}In WordStreak, <strong>only one person submits per day</strong> — both of you share the same 10 words so you can learn and quiz together.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 pt-1 border-t border-gray-800/80">
+              <Link
+                href="/learn"
+                className="btn btn-primary-vinuu text-xs py-2.5 px-4 rounded-xl font-semibold inline-flex items-center gap-2 shadow-md"
+              >
+                <BookOpen className="w-4 h-4" /> Go to Learn (Flip Flashcards)
+              </Link>
+              <Link
+                href="/dashboard"
+                className="btn btn-ghost text-xs py-2.5 px-4 rounded-xl font-semibold inline-flex items-center gap-2"
+              >
+                <LayoutDashboard className="w-4 h-4" /> Back to Dashboard
+              </Link>
+            </div>
+          </div>
+        )}
+
         {/* Progress bar of 10 words */}
         <div className="glass-card p-4 border-gray-800 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -548,15 +625,19 @@ export default function SubmitWordsPage() {
 
             <button
               type="submit"
-              disabled={isSubmitting || filledCount < 10}
+              disabled={isSubmitting || filledCount < 10 || !!alreadyPublished}
               className={`btn py-3.5 px-8 rounded-xl font-bold text-sm flex items-center gap-2 ${
-                filledCount >= 10
+                filledCount >= 10 && !alreadyPublished
                   ? "bg-linear-to-r from-violet-600 to-amber-500 hover:from-violet-500 hover:to-amber-400 text-white shadow-lg hover-lift"
                   : "btn-ghost opacity-50 cursor-not-allowed"
               }`}
             >
               <Send className="w-4 h-4" />
-              {isSubmitting ? "Registering & Validating..." : "Submit 10 Words"}
+              {isSubmitting
+                ? "Registering & Validating..."
+                : alreadyPublished
+                ? "Today's Words Already Published"
+                : "Submit 10 Words"}
             </button>
           </div>
         </form>
