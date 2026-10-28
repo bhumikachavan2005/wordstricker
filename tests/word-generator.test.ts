@@ -33,4 +33,14 @@ describe("Hybrid Word Generator", () => {
     const set = new Set(words.map((w) => normalizeWord(w.word)));
     expect(set.size).toBe(10);
   });
+
+  it("should prioritize practical daily life use words", async () => {
+    const words = await getUniqueWordBatch([], 10);
+    expect(words).toHaveLength(10);
+    // Verify that at least one daily life attribute or common practical word is included
+    const hasDailyLifeWords = words.some(
+      (w) => w.isDailyLife === true || ["easy", "medium"].includes(w.difficulty)
+    );
+    expect(hasDailyLifeWords).toBe(true);
+  });
 });

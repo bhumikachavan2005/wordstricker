@@ -29,84 +29,84 @@ const INITIAL_WORD: WordFormData = {
 
 const SAMPLE_WORDS_COLLECTION = [
   {
-    word: "Soliloquy",
-    meaning: "An act of speaking one's thoughts aloud when by oneself or regardless of any hearers",
-    pronunciation: "suh-LIL-uh-kwee",
-    partOfSpeech: "noun",
-    exampleSentence: "The actor delivered a moving soliloquy that captivated the entire theater.",
-    difficulty: "medium" as const,
-  },
-  {
-    word: "Mellifluous",
-    meaning: "Sweet or musical; pleasant to hear",
-    pronunciation: "muh-LIF-loo-us",
-    partOfSpeech: "adjective",
-    exampleSentence: "She had a mellifluous voice that soothed everyone in the room.",
-    difficulty: "hard" as const,
-  },
-  {
-    word: "Serendipity",
-    meaning: "The occurrence of events by chance in a happy or beneficial way",
-    pronunciation: "sair-un-DIP-ih-tee",
-    partOfSpeech: "noun",
-    exampleSentence: "Finding my favorite lost book in the attic was pure serendipity.",
-    difficulty: "medium" as const,
-  },
-  {
-    word: "Ephemeral",
-    meaning: "Lasting for a very short time; fleeting",
-    pronunciation: "ih-FEM-er-ul",
-    partOfSpeech: "adjective",
-    exampleSentence: "The morning mist was ephemeral, disappearing as soon as the sun rose.",
-    difficulty: "medium" as const,
-  },
-  {
-    word: "Sycophant",
-    meaning: "A person who acts obsequiously toward someone important in order to gain advantage",
-    pronunciation: "SIK-uh-funt",
-    partOfSpeech: "noun",
-    exampleSentence: "The ruler was surrounded by sycophants who never questioned his foolish decisions.",
-    difficulty: "hard" as const,
-  },
-  {
-    word: "Alacrity",
-    meaning: "Brisk and cheerful readiness; eager willingness",
-    pronunciation: "uh-LAK-rih-tee",
-    partOfSpeech: "noun",
-    exampleSentence: "She accepted the promotion offer with enthusiastic alacrity.",
-    difficulty: "hard" as const,
-  },
-  {
-    word: "Cacophony",
-    meaning: "A harsh, discordant mixture of sounds",
-    pronunciation: "kuh-KOF-uh-nee",
-    partOfSpeech: "noun",
-    exampleSentence: "A cacophony of car horns and construction machines echoed through the street.",
-    difficulty: "medium" as const,
-  },
-  {
-    word: "Ubiquitous",
-    meaning: "Present, appearing, or found everywhere",
-    pronunciation: "yoo-BIK-wih-tus",
-    partOfSpeech: "adjective",
-    exampleSentence: "Smartphones have become ubiquitous across all age groups.",
-    difficulty: "medium" as const,
-  },
-  {
-    word: "Tenacious",
-    meaning: "Tending to keep a firm hold of something; clinging or adhering closely; persistent",
-    pronunciation: "tuh-NAY-shus",
-    partOfSpeech: "adjective",
-    exampleSentence: "His tenacious work ethic led to breakthroughs that others deemed impossible.",
+    word: "Empathy",
+    meaning: "The ability to understand and share the feelings or thoughts of another person",
+    pronunciation: "EM-puh-thee",
+    partOfSpeech: "noun" as const,
+    exampleSentence: "Showing empathy to a stressed friend can make their entire day better.",
     difficulty: "easy" as const,
   },
   {
-    word: "Luminescence",
-    meaning: "The emission of light by a substance not resulting from heat",
-    pronunciation: "loo-mih-NES-ens",
-    partOfSpeech: "noun",
-    exampleSentence: "The deep sea jellyfish emitted a stunning blue luminescence.",
+    word: "Resilient",
+    meaning: "Able to withstand or recover quickly from difficult conditions and setbacks",
+    pronunciation: "rih-ZIL-yunt",
+    partOfSpeech: "adjective" as const,
+    exampleSentence: "Children are often remarkably resilient when adapting to new surroundings.",
+    difficulty: "easy" as const,
+  },
+  {
+    word: "Pragmatic",
+    meaning: "Dealing with problems in a practical, realistic way rather than following theoretical ideas",
+    pronunciation: "prag-MAT-ik",
+    partOfSpeech: "adjective" as const,
+    exampleSentence: "We made a pragmatic choice to take the metro instead of driving in heavy traffic.",
     difficulty: "medium" as const,
+  },
+  {
+    word: "Mindful",
+    meaning: "Conscious, aware, and giving close attention to the present moment and surroundings",
+    pronunciation: "MYND-ful",
+    partOfSpeech: "adjective" as const,
+    exampleSentence: "Being mindful of your screen time helps you sleep much better at night.",
+    difficulty: "easy" as const,
+  },
+  {
+    word: "Authentic",
+    meaning: "Genuine, real, and true to one's own personality, values, or origin",
+    pronunciation: "aw-THEN-tik",
+    partOfSpeech: "adjective" as const,
+    exampleSentence: "People respect coworkers who are authentic and honest about what they think.",
+    difficulty: "easy" as const,
+  },
+  {
+    word: "Collaborate",
+    meaning: "To work jointly with others on an activity, task, or creative project",
+    pronunciation: "kuh-LAB-uh-rayt",
+    partOfSpeech: "verb" as const,
+    exampleSentence: "The two teammates collaborated closely to finish the presentation ahead of time.",
+    difficulty: "easy" as const,
+  },
+  {
+    word: "Perspective",
+    meaning: "A particular attitude toward or way of regarding something; a point of view",
+    pronunciation: "per-SPEK-tiv",
+    partOfSpeech: "noun" as const,
+    exampleSentence: "Talking to an old friend gave him a helpful new perspective on his daily routine.",
+    difficulty: "easy" as const,
+  },
+  {
+    word: "Spontaneous",
+    meaning: "Performed or occurring naturally as a result of sudden impulse without prior planning",
+    pronunciation: "spon-TAY-nee-us",
+    partOfSpeech: "adjective" as const,
+    exampleSentence: "They decided on a spontaneous evening road trip to watch the sunset by the lake.",
+    difficulty: "medium" as const,
+  },
+  {
+    word: "Grateful",
+    meaning: "Feeling or showing appreciation and thankfulness for kindness or good things in life",
+    pronunciation: "GRAYT-ful",
+    partOfSpeech: "adjective" as const,
+    exampleSentence: "I am grateful for the warm meal and continuous support from my family.",
+    difficulty: "easy" as const,
+  },
+  {
+    word: "Adaptable",
+    meaning: "Able to adjust readily to new conditions, environments, or changing circumstances",
+    pronunciation: "uh-DAP-tuh-bul",
+    partOfSpeech: "adjective" as const,
+    exampleSentence: "Being adaptable is essential when moving into a new neighborhood or job.",
+    difficulty: "easy" as const,
   },
 ];
 
@@ -357,7 +357,7 @@ export default function SubmitWordsPage() {
               Submit Today&apos;s 10 Words
             </h1>
             <p className="text-xs sm:text-sm text-gray-400 mt-1">
-              Add today&apos;s vocabulary batch. Every word is strictly checked against the global archive to prevent duplicates.
+              Add today&apos;s 10 daily-life vocabulary words. Every word is strictly checked against the global archive to prevent duplicates.
             </p>
           </div>
 
@@ -367,17 +367,17 @@ export default function SubmitWordsPage() {
               onClick={fillSampleWords}
               disabled={isGenerating}
               className="btn btn-ghost text-xs py-2 px-3 rounded-lg border-violet-500/30 text-violet-300 hover:bg-violet-950/30 transition-all flex items-center gap-1.5"
-              title="Generate 10 completely fresh, unique words"
+              title="Generate 10 practical, daily-life vocabulary words"
             >
               {isGenerating ? (
                 <>
                   <div className="w-3.5 h-3.5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
-                  <span>Generating 10 Fresh Words...</span>
+                  <span>Generating 10 Daily-Life Words...</span>
                 </>
               ) : (
                 <>
                   <Wand2 className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Quick Fill 10 Fresh Words</span>
+                  <span>Quick Fill 10 Daily-Life Words</span>
                 </>
               )}
             </button>
@@ -395,7 +395,7 @@ export default function SubmitWordsPage() {
 
         {/* Already Published Educational Notice */}
         {alreadyPublished && (
-          <div className="glass-card p-6 border-amber-500/30 bg-gradient-to-r from-amber-950/40 via-purple-950/20 to-gray-900/60 rounded-2xl shadow-xl space-y-4 animate-fade-in-up">
+          <div className="glass-card p-6 border-amber-500/30 bg-linear-to-r from-amber-950/40 via-purple-950/20 to-gray-900/60 rounded-2xl shadow-xl space-y-4 animate-fade-in-up">
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center shrink-0">
                 <Sparkles className="w-5 h-5 text-amber-400" />
@@ -520,7 +520,7 @@ export default function SubmitWordsPage() {
                       value={wordItem.word}
                       onChange={(e) => updateWordField(index, "word", e.target.value)}
                       onBlur={() => validateSingleWord(index)}
-                      placeholder="e.g. Ephemeral"
+                      placeholder="e.g. Resilient"
                       className={`input-field text-sm ${
                         isDup ? "border-red-500 focus:border-red-500" : ""
                       }`}
@@ -537,7 +537,7 @@ export default function SubmitWordsPage() {
                       type="text"
                       value={wordItem.pronunciation}
                       onChange={(e) => updateWordField(index, "pronunciation", e.target.value)}
-                      placeholder="ih-FEM-er-ul"
+                      placeholder="rih-ZIL-yunt"
                       className="input-field text-sm"
                     />
                   </div>
@@ -602,7 +602,7 @@ export default function SubmitWordsPage() {
                       type="text"
                       value={wordItem.exampleSentence}
                       onChange={(e) => updateWordField(index, "exampleSentence", e.target.value)}
-                      placeholder="Use the word in a lively contextual sentence"
+                      placeholder="Use the word in a practical daily life sentence"
                       className="input-field text-sm"
                     />
                   </div>

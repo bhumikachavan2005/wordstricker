@@ -9,6 +9,7 @@ export interface GeneratedWordItem {
   exampleSentence: string;
   difficulty: "easy" | "medium" | "hard";
   source: "gemini" | "curated_bank";
+  isDailyLife?: boolean;
 }
 
 /**
@@ -24,7 +25,7 @@ function shuffle<T>(array: T[]): T[] {
 }
 
 /**
- * Attempt to generate 10 fresh, non-duplicate words using Google Gemini.
+ * Attempt to generate 10 fresh, non-duplicate daily-life words using Google Gemini.
  * Returns null if Gemini is unconfigured or fails.
  */
 async function generateWordsViaGemini(
@@ -39,18 +40,27 @@ async function generateWordsViaGemini(
   // Sample of words to avoid (keep prompt size reasonable)
   const excludeSample = Array.from(excludeWords).slice(-40).join(", ");
 
-  const prompt = `You are an expert English vocabulary educator.
-Generate ${count} distinct, high-quality, inspiring English vocabulary words (GRE/TOEFL standard).
-IMPORTANT REQUIREMENTS:
-1. Every word MUST be completely unique.
-2. DO NOT use any of these already-registered words: [${excludeSample}].
-3. For each word, provide:
-   - word: The vocabulary word (properly capitalized, single word)
-   - meaning: Clear, concise definition (10-25 words)
-   - pronunciation: Phonetic spelling (e.g., 'muh-LIF-loo-us')
+  const prompt = `You are a practical English language and communication coach.
+Generate ${count} distinct, useful English vocabulary words that people encounter and use in DAILY LIFE, everyday conversations, workplace discussions, emotions, personal habits, and social interactions.
+
+MANDATORY GUIDELINES FOR WORD SELECTION:
+1. FOCUS STRICTLY ON DAILY LIFE USE WORDS:
+   - Words MUST be practical, relatable, and commonly used in everyday real-world communication (e.g., words like 'Resilient', 'Empathy', 'Pragmatic', 'Mindful', 'Curious', 'Spontaneous', 'Diligent', 'Authentic', 'Collaborate', 'Adaptable', 'Compassion', 'Generous', 'Sincere', 'Patience', 'Courageous', 'Consistent', 'Versatile', 'Perspective', 'Grateful', 'Resourceful', 'Hesitate', 'Appreciate', 'Optimistic', 'Reliable', 'Attentive', 'Approachable', 'Decisive', 'Sensible', 'Thoughtful', 'Flexible').
+   - DO NOT generate overly hard, obscure, archaic, or complex academic GRE/TOEFL vocabulary.
+   - STRICTLY AVOID words like: 'anachronism', 'sycophant', 'obsequious', 'pusillanimous', 'ephemeral', 'cacophony', 'alacrity', 'bucolic', 'soliloquy', 'mellifluous', 'grandiloquent', 'chimerical'.
+   - Words must be accessible, empowering, natural, and immediately applicable in everyday conversations and daily journaling.
+
+2. UNICITY & EXCLUSIONS:
+   - Every word in this batch MUST be completely unique.
+   - DO NOT use any of these already-registered words: [${excludeSample}].
+
+3. FOR EACH WORD, PROVIDE:
+   - word: The vocabulary word (properly capitalized, single English word, no spaces or hyphens)
+   - meaning: A simple, clear, concise definition in plain English (8-20 words) explaining how it is understood in daily life
+   - pronunciation: Simple phonetic pronunciation guide (e.g., 'EM-puh-thee', 'rih-ZIL-yunt')
    - partOfSpeech: One of ['noun', 'verb', 'adjective', 'adverb']
-   - exampleSentence: Natural, engaging example sentence showcasing the word in context
-   - difficulty: One of ['easy', 'medium', 'hard']
+   - exampleSentence: A natural, relatable everyday life sentence (e.g. at home, with friends, at work, or daily routine)
+   - difficulty: One of ['easy', 'medium', 'hard'] (prefer 'easy' or 'medium' for daily life words)
 
 Return ONLY a valid JSON array of objects adhering strictly to this schema:
 [
@@ -74,9 +84,16 @@ Return ONLY a valid JSON array of objects adhering strictly to this schema:
           "x-goog-api-key": apiKey,
         },
         body: JSON.stringify({
+          systemInstruction: {
+            parts: [
+              {
+                text: "You are an English coach focused strictly on practical, daily-life vocabulary. Generate practical everyday words used in daily conversations and real life, strictly avoiding archaic, academic, or overly hard GRE/TOEFL words.",
+              },
+            ],
+          },
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
-            temperature: 0.85,
+            temperature: 0.7,
             responseMimeType: "application/json",
             maxOutputTokens: 1500,
           },
@@ -114,11 +131,12 @@ Return ONLY a valid JSON array of objects adhering strictly to this schema:
         partOfSpeech: (["noun", "verb", "adjective", "adverb"].includes(item.partOfSpeech)
           ? item.partOfSpeech
           : "noun") as "noun" | "verb" | "adjective" | "adverb",
-        exampleSentence: item.exampleSentence?.trim() || `The concept of ${item.word} is widely studied.`,
+        exampleSentence: item.exampleSentence?.trim() || `The concept of ${item.word} is useful in daily conversations.`,
         difficulty: (["easy", "medium", "hard"].includes(item.difficulty)
           ? item.difficulty
-          : "medium") as "easy" | "medium" | "hard",
+          : "easy") as "easy" | "medium" | "hard",
         source: "gemini",
+        isDailyLife: true,
       });
 
       if (validWords.length >= count) break;
@@ -133,9 +151,9 @@ Return ONLY a valid JSON array of objects adhering strictly to this schema:
 
 /**
  * Main Hybrid Generator:
- * 1. Tries Gemini AI with exclude-list check.
- * 2. If Gemini is unavailable, immediately selects unused words from the curated bank.
- * 3. Guaranteed to return non-duplicate, fully validated words.
+ * 1. Tries Gemini AI with strict daily-life vocabulary instruction and exclude-list check.
+ * 2. If Gemini is unavailable, immediately selects unused daily-life words from the curated bank.
+ * 3. Guaranteed to return non-duplicate, fully validated daily-life words.
  */
 export async function getUniqueWordBatch(
   existingNormalizedWords: string[],
@@ -156,8 +174,12 @@ export async function getUniqueWordBatch(
     (item) => !excludeSet.has(normalizeWord(item.word))
   );
 
-  // Shuffle available bank words
-  const shuffled = shuffle(availableInBank);
+  // Prioritize daily-life use vocabulary words
+  const dailyLifeAvailable = availableInBank.filter((item) => item.isDailyLife === true);
+  const primaryPool = dailyLifeAvailable.length >= count ? dailyLifeAvailable : availableInBank;
+
+  // Shuffle candidate pool
+  const shuffled = shuffle(primaryPool);
 
   if (shuffled.length >= count) {
     return shuffled.slice(0, count).map((w) => ({
@@ -166,7 +188,7 @@ export async function getUniqueWordBatch(
     }));
   }
 
-  // If bank has fewer than `count` left, take whatever unused remain
+  // If pool has fewer than `count` left, take whatever unused remain
   const result: GeneratedWordItem[] = shuffled.map((w) => ({
     ...w,
     source: "curated_bank" as const,
@@ -175,7 +197,7 @@ export async function getUniqueWordBatch(
   // Fill remaining slots from all bank items not currently in the chosen batch
   const chosenNormalized = new Set(result.map((w) => normalizeWord(w.word)));
   const remainingCandidates = shuffle(
-    CURATED_VOCABULARY_BANK.filter((w) => !chosenNormalized.has(normalizeWord(w.word)))
+    availableInBank.filter((w) => !chosenNormalized.has(normalizeWord(w.word)))
   );
 
   for (const item of remainingCandidates) {
